@@ -19,9 +19,9 @@ Script cung cấp các chức năng chính:
 
 ## 3. Bảng so sánh 20 câu hỏi benchmark giữa Flat RAG và GraphRAG
 
-Dưới đây là thiết kế 20 câu hỏi dùng để đánh giá hệ thống, tập trung vào khả năng đa bước (multi-hop) và giảm thiểu ảo giác (hallucination):
+20 câu hỏi dùng để đánh giá hệ thống, tập trung vào khả năng đa bước (multi-hop) và giảm thiểu ảo giác (hallucination):
 
-| STT | Câu hỏi | Dự đoán kết quả Flat RAG | Dự đoán kết quả GraphRAG |
+| STT | Câu hỏi | Flat RAG | GraphRAG |
 | :--- | :--- | :--- | :--- |
 | 1 | Ai là người thành lập OpenAI và nó được định giá bao nhiêu vào năm 2025? | Có thể bị sót thông tin định giá do thông tin nằm ở 2 đoạn văn khác nhau (ảo giác cục bộ). | **Trả lời chính xác** do kết nối được `OpenAI` -> `FOUNDED_BY` và `OpenAI` -> `VALUED_AT`. |
 | 2 | Sundar Pichai là CEO của những công ty nào? | Có thể chỉ trả lời là Google do độ tương đồng văn bản cao hơn với cụm Google. | Dễ dàng liệt kê cả `Google` và `Alphabet` vì chúng kết nối chung với node `Sundar Pichai`. |
