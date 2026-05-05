@@ -165,50 +165,64 @@ def run_evaluation():
     # 3. Xây dựng Flat RAG
     vectorstore = setup_flat_rag(CORPUS_PATH)
 
-    # 4. Danh sách 5 câu hỏi benchmark để test
+    # 4. Danh sách 20 câu hỏi benchmark để test
     test_cases = [
-        {
-            "q": "Ai là những người đồng sáng lập của OpenAI và công ty này được định giá bao nhiêu vào năm 2025?",
-            "entities": ["OpenAI", "2025"]
-        },
-        {
-            "q": "Sundar Pichai giữ chức vụ gì ở Google và Alphabet?",
-            "entities": ["Sundar Pichai", "Google", "Alphabet"]
-        },
-        {
-            "q": "Microsoft đã mua lại những công ty nào trong quá khứ?",
-            "entities": ["Microsoft"]
-        },
-        {
-            "q": "Meta Platforms sở hữu những ứng dụng mạng xã hội nào?",
-            "entities": ["Meta Platforms"]
-        },
-        {
-            "q": "Apple được định giá 4 nghìn tỷ đô la vào thời điểm nào và CEO hiện tại là ai?",
-            "entities": ["Apple", "4 nghìn tỷ"]
-        }
+        {"q": "Ai là người thành lập OpenAI và nó được định giá bao nhiêu vào năm 2025?", "entities": ["OpenAI", "2025"]},
+        {"q": "Sundar Pichai là CEO của những công ty nào?", "entities": ["Sundar Pichai", "CEO"]},
+        {"q": "Microsoft đã mua lại những ứng dụng/công ty nào trong quá khứ?", "entities": ["Microsoft", "ACQUIRED"]},
+        {"q": "Kể tên các sản phẩm mạng xã hội và nhắn tin của Meta.", "entities": ["Meta Platforms"]},
+        {"q": "Tại sao OpenAI lại sa thải và phục chức cho Sam Altman?", "entities": ["OpenAI", "Sam Altman"]},
+        {"q": "Meta Platforms đã mua lại WhatsApp và Instagram với giá trị bao nhiêu?", "entities": ["Meta Platforms", "WhatsApp", "Instagram"]},
+        {"q": "Apple Inc. được thành lập vào năm nào và ai là người sáng lập?", "entities": ["Apple Inc."]},
+        {"q": "Sản phẩm nào của Apple ra đời sau khi mua lại NeXT?", "entities": ["Apple", "NeXT"]},
+        {"q": "Amazon mua lại Whole Foods Market vào thời gian nào và giá bao nhiêu?", "entities": ["Amazon", "Whole Foods Market"]},
+        {"q": "Công ty mẹ của Google tên gì và thành lập năm nào?", "entities": ["Google", "PARENT_COMPANY"]},
+        {"q": "Ai là người thay thế Tim Cook tại Apple (nếu có đề cập)?", "entities": ["Tim Cook", "Apple", "SUCCESSOR"]},
+        {"q": "Các công ty công nghệ lớn nào (Big Tech) từng bị chỉ trích vì độc quyền?", "entities": ["monopoly", "Big Tech", "CRITICIZED_FOR"]},
+        {"q": "Những ai tham gia sáng lập Tesla cùng với Elon Musk?", "entities": ["Tesla", "Elon Musk"]},
+        {"q": "OpenAI, Google và Amazon sử dụng công nghệ chung nào?", "entities": ["OpenAI", "Google", "Amazon", "USES_TECHNOLOGY"]},
+        {"q": "Năm 2012, Facebook có sự kiện lớn nào liên quan đến tài chính?", "entities": ["Facebook", "2012", "IPO"]},
+        {"q": "Ai đã đầu tư vào OpenAI tính đến năm 2021?", "entities": ["OpenAI", "INVESTED_BY", "2021"]},
+        {"q": "Công ty nào sản xuất dòng thiết bị Kindle và Echo?", "entities": ["Kindle", "Echo"]},
+        {"q": "Dịch vụ đám mây của Microsoft và Amazon tên là gì?", "entities": ["Microsoft", "Amazon", "cloud"]},
+        {"q": "Có sự thay đổi CEO nào xảy ra ở Google năm 2015 không?", "entities": ["Google", "CEO", "2015"]},
+        {"q": "Tóm tắt điểm chung giữa Microsoft và Apple trong kho dữ liệu này.", "entities": ["Microsoft", "Apple"]}
     ]
 
     print("\n" + "="*50)
-    print("BẮT ĐẦU SO SÁNH FLAT RAG VÀ GRAPHRAG")
+    print("BẮT ĐẦU CHẠY BENCHMARK 20 CÂU HỎI...")
     print("="*50)
+    
+    markdown_table = "| STT | Câu hỏi | Kết quả Flat RAG | Kết quả GraphRAG |\n"
+    markdown_table += "|---|---|---|---|\n"
     
     for i, case in enumerate(test_cases, 1):
         question = case["q"]
         entities = case["entities"]
-        print(f"\n[Câu hỏi {i}]: {question}")
-        print(f"  -> Các thực thể nhận diện (để Graph tìm): {entities}")
+        print(f"Đang xử lý câu {i}/20: {question}")
         
-        # Flat RAG
-        flat_ans = answer_with_flat_rag(vectorstore, llm, question)
-        print(f"\n--- [Flat RAG Output] ---\n{flat_ans}")
-        
-        # Graph RAG
-        graph_ans = answer_with_graph_rag(kg, llm, question, entities)
-        print(f"\n--- [Graph RAG Output] ---\n{graph_ans}")
-        print("-" * 50)
+        # Xóa ký tự xuống dòng để đưa vào bảng markdown cho gọn
+        try:
+            flat_ans = answer_with_flat_rag(vectorstore, llm, question).replace("\n", " ")
+        except Exception as e:
+            flat_ans = f"Lỗi truy vấn: {str(e)}"
+            
+        try:
+            graph_ans = answer_with_graph_rag(kg, llm, question, entities).replace("\n", " ")
+        except Exception as e:
+            graph_ans = f"Lỗi truy vấn: {str(e)}"
+            
+        markdown_table += f"| {i} | {question} | {flat_ans} | {graph_ans} |\n"
         
     kg.close()
+    
+    # Ghi kết quả ra file markdown
+    output_file = "benchmark_results.md"
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("# KẾT QUẢ BENCHMARK 20 CÂU HỎI (FLAT RAG VS GRAPHRAG)\n\n")
+        f.write(markdown_table)
+        
+    print(f"\nĐã xuất kết quả ra file: {output_file}")
 
 if __name__ == "__main__":
     print("Lưu ý: Để chạy được script này, cần có:")
