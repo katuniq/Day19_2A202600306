@@ -12,9 +12,8 @@ Script cung cấp các chức năng chính:
 > **Hướng dẫn:**
 > 1. Chạy file `graphrag_solution.py` với biến môi trường phù hợp.
 > 2. Mở **Neo4j Desktop** (hoặc truy cập http://localhost:7474/).
-> 3. Trong trình duyệt Neo4j (Neo4j Browser), hãy nhập lệnh Cypher sau để trực quan hóa đồ thị:
+> 3. Trong trình duyệt Neo4j (Neo4j Browser), nhập lệnh Cypher sau:
 >    `MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 150`
-> 4. Chụp ảnh màn hình các nodes và edges đầy màu sắc và dán vào phần này.
 
   ![Neo4j Graph](/neo4j_graph.png)
 
